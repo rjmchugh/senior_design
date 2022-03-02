@@ -31,7 +31,7 @@ def noalsaerr():
 
 with noalsaerr():
 
-    chunk = 1024
+    chunk = 2048
     channels = 2
     fs = 44100
     seconds = int(input("How many seconds do you want to talk?"))
@@ -45,7 +45,7 @@ stream = p.open( format=pyaudio.paInt16,rate=fs, channels = channels,
 frames = []
 
 for i in range(0, int(fs / chunk * seconds)):
-    frames.append(stream.read(1024))
+    frames.append(stream.read(chunk))
 
 stream.stop_stream()
 stream.close()
@@ -79,7 +79,7 @@ print('Transcription Requested')
 polling_response = requests.get(transcript_endpoint+"/"+transcript_response.json()['id'], headers=headers)
 filename = transcript_response.json()['id'] + '.txt'
 while polling_response.json()['status'] != 'completed':
-    # sleep(2)
+    sleep(10)
     polling_response = requests.get(transcript_endpoint+"/"+transcript_response.json()['id'], headers=headers)
     # print("File is", polling_response.json()['status'])
 # with open(filename, 'w') as f:
