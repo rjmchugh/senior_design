@@ -3,8 +3,11 @@ import websockets
 import asyncio
 import base64
 import json
+import os
+import pyglet
 from ctypes import *
 from contextlib import contextmanager
+from gtts import gTTS
 
 headers = {
     "authorization": "8fb4e965ed4a4303b8d250009e6ea54d",
@@ -45,7 +48,23 @@ stream = p.open(
 
 # the AssemblyAI endpoint we're going to hit
 URL = "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000"
- 
+
+async def hello():
+    temp_text = "Hello User"
+
+    output = gTTS(text=temp_text, lang='en', slow=False)
+
+    output.save("temp.mp3")
+
+    sound = pyglet.media.load("/home/rjmchugh/senior_design/temp.mp3")
+
+    sound.play()
+
+    print("Output: " + temp_text)
+
+    await asyncio.sleep(0.03)
+
+
 async def send_receive():
     auth_key = "8fb4e965ed4a4303b8d250009e6ea54d"
     print(f'Connecting websocket to url ${URL}')
@@ -82,7 +101,10 @@ async def send_receive():
             while True:
                 try:
                     result_str = await _ws.recv()
-                    print(json.loads(result_str)['text'])
+                    temp = json.loads(result_str)['text']
+                    print(temp)
+                    if 'Hey Alexa' in temp or 'Hey, Alexa' in temp:
+                        hello_result = await asyncio.gather(hello())
                 except websockets.exceptions.ConnectionClosedError as e:
                     print(e)
                     assert e.code == 4008
