@@ -49,6 +49,9 @@ stream = p.open(
 # the AssemblyAI endpoint we're going to hit
 URL = "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000"
 
+
+
+
 async def hello():
     temp_text = "Hello User"
 
@@ -65,6 +68,10 @@ async def hello():
     await asyncio.sleep(0.03)
 
 
+async def handle_text(txt):
+    if all(x in txt for x in ["Hey", "Alexa", "."]) in txt:
+        await asyncio.gather(hello())
+
 async def send_receive():
     auth_key = "8fb4e965ed4a4303b8d250009e6ea54d"
     print(f'Connecting websocket to url ${URL}')
@@ -80,6 +87,7 @@ async def send_receive():
         print(session_begins)
         print("Sending messages ...")
 
+        # sending audio to speech recognition endpoint 
         async def send():
             while True:
                 try:
@@ -97,14 +105,14 @@ async def send_receive():
             
             return True
         
+        # reciving back text from the speech recognition endpoint
         async def receive():
             while True:
                 try:
                     result_str = await _ws.recv()
                     temp = json.loads(result_str)['text']
                     print(temp)
-                    if 'Hey Alexa' in temp or 'Hey, Alexa' in temp:
-                        hello_result = await asyncio.gather(hello())
+                    await asyncio.gather(handle_text(temp))
                 except websockets.exceptions.ConnectionClosedError as e:
                     print(e)
                     assert e.code == 4008
