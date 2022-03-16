@@ -5,9 +5,11 @@ import base64
 import json
 import os
 import pyglet
+import pyttsx3
 from ctypes import *
 from contextlib import contextmanager
 from gtts import gTTS
+
 
 headers = {
     "authorization": "8fb4e965ed4a4303b8d250009e6ea54d",
@@ -30,7 +32,7 @@ def noalsaerr():
 
 with noalsaerr():
  
-    FRAMES_PER_BUFFER = 8192
+    FRAMES_PER_BUFFER = 10000 #8192
     FORMAT = pyaudio.paInt16
     CHANNELS = 1
     RATE = 16000
@@ -55,13 +57,9 @@ URL = "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000"
 async def hello():
     temp_text = "Hello User"
 
-    output = gTTS(text=temp_text, lang='en', slow=False)
-
-    output.save("temp.mp3")
-
-    sound = pyglet.media.load("/home/rjmchugh/senior_design/temp.mp3")
-
-    sound.play()
+    engine = pyttsx3.init()
+    engine.say(temp_text)
+    engine.runAndWait()
 
     print("Output: " + temp_text)
 
@@ -69,12 +67,12 @@ async def hello():
 
 
 async def handle_text(txt):
-    if all(x in txt for x in ["Hey", "Alexa", "."]) in txt:
+    if all(x in str(txt) for x in ["Hi", "computer", "."]):
         await asyncio.gather(hello())
 
 async def send_receive():
     auth_key = "8fb4e965ed4a4303b8d250009e6ea54d"
-    print(f'Connecting websocket to url ${URL}')
+    # print(f'Connecting websocket to url ${URL}')
     async with websockets.connect(
         URL,
         extra_headers=(("Authorization", auth_key),),
@@ -84,7 +82,7 @@ async def send_receive():
         await asyncio.sleep(0.1)
         print("Receiving SessionBegins ...")
         session_begins = await _ws.recv()
-        print(session_begins)
+        # print(session_begins)
         print("Sending messages ...")
 
         # sending audio to speech recognition endpoint 
@@ -111,8 +109,10 @@ async def send_receive():
                 try:
                     result_str = await _ws.recv()
                     temp = json.loads(result_str)['text']
-                    print(temp)
-                    await asyncio.gather(handle_text(temp))
+                    if(temp != ""):
+                        print(temp)
+                    if "." in temp:
+                        await asyncio.gather(handle_text(temp))
                 except websockets.exceptions.ConnectionClosedError as e:
                     print(e)
                     assert e.code == 4008
