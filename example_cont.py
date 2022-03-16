@@ -32,7 +32,7 @@ def noalsaerr():
 
 with noalsaerr():
  
-    FRAMES_PER_BUFFER = 10000 #8192
+    FRAMES_PER_BUFFER = 8192
     FORMAT = pyaudio.paInt16
     CHANNELS = 1
     RATE = 16000
@@ -89,7 +89,7 @@ async def send_receive():
         async def send():
             while True:
                 try:
-                    data = stream.read(FRAMES_PER_BUFFER)
+                    data = stream.read(FRAMES_PER_BUFFER, exception_on_overflow=False)
                     data = base64.b64encode(data).decode("utf-8")
                     json_data = json.dumps({"audio_data":str(data)})
                     await _ws.send(json_data)
