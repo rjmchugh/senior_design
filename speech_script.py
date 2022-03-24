@@ -3,12 +3,9 @@ import websockets
 import asyncio
 import base64
 import json
-import os
-import pyglet
 import pyttsx3
 from ctypes import *
 from contextlib import contextmanager
-from gtts import gTTS
 
 
 headers = {
