@@ -1,7 +1,5 @@
-import sys
-# from configure import auth_key
+# adapted from code on www.assemblyai.com
 import requests
-import pprint
 import pyaudio
 import wave
 from time import sleep

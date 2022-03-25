@@ -1,3 +1,4 @@
+# adapted from code on www.assemblyai.com
 import pyaudio
 import websockets
 import asyncio
