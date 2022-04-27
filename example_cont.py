@@ -30,7 +30,6 @@ def noalsaerr():
     asound.snd_lib_error_set_handler(c_error_handler)
     yield
     asound.snd_lib_error_set_handler(None)
-
 with noalsaerr():
  
     FRAMES_PER_BUFFER = 8192
@@ -52,9 +51,7 @@ stream = p.open(
 # the AssemblyAI endpoint we're going to hit
 URL = "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000"
 
-async def voice_
-
-out(text_input):
+async def voice_out(text_input):
 	# engine = pyttsx3.init()
 	# engine.setProperty('voice','english_rp+f3')
 	# engine.say(text_input)
@@ -72,11 +69,11 @@ async def handle_text(txt):
 	if all(x in str(txt) for x in ["Hi", "computer", "."]):
 		await asyncio.gather(voice_out("Hello!"))
 	elif all(x in str(txt) for x in ["Good", "morning", "."]):
-		await asyncio.gather(voice_out("Did, you, have, a, balanced, breakfast, today?"))
+		await asyncio.gather(voice_out("Did you have a balanced breakfast today?"))
 	elif all(x in str(txt) for x in ["breakfast", "example",  "."]):
-		await asyncio.gather(voice_out("Some, eggs, fruit, and, orange, juice."))
+		await asyncio.gather(voice_out("Some eggs fruit and orange juice."))
 	elif all(x in str(txt) for x in ["exactly", "eat",  "."]):
-		await asyncio.gather(voice_out("Perfect! Lets, play!"))
+		await asyncio.gather(voice_out("Perfect! Lets play!"))
 
 async def send_receive():
 	start = True;
