@@ -4,12 +4,18 @@ import asyncio
 import base64
 import json
 import pyttsx3
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 from gtts import gTTS
 from pydub import AudioSegment
 from pydub.playback import play
 from ctypes import *
 from contextlib import contextmanager
 
+cred = credentials.Certificate('benten-imani-doll-firebase-adminsdk-bqh56-515e72e62d.json')
+
+firebase_admin.initialize_app(cred)
 
 headers = {
     "authorization": "8fb4e965ed4a4303b8d250009e6ea54d",
@@ -51,12 +57,20 @@ stream = p.open(
 # the AssemblyAI endpoint we're going to hit
 URL = "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000"
 
+async def upload_to_database(doll, text):
+	db = firestore.client()
+	doc_ref = db.collection(u'Messages').document(u'PF9IRnCJSCmpANNWV850')
+	doc_ref.update({
+		u'isDoll': doll,
+		u'speech': text
+	})
+
 async def voice_out(text_input):
 	# engine = pyttsx3.init()
 	# engine.setProperty('voice','english_rp+f3')
 	# engine.say(text_input)
 	# engine.runAndWait()
-
+	await upload_to_database(True, text_input)
 	tts = gTTS(text_input, lang='en')
 	tts.save('temp.mp3')
 	tts_out = AudioSegment.from_file('temp.mp3')
@@ -66,6 +80,7 @@ async def voice_out(text_input):
 	await asyncio.sleep(0.03)
 
 async def handle_text(txt):
+	await upload_to_database(False, txt)
 	if all(x in str(txt) for x in ["Hi", "computer", "."]):
 		await asyncio.gather(voice_out("Hello!"))
 	elif all(x in str(txt) for x in ["Good", "morning", "."]):
@@ -79,6 +94,7 @@ async def send_receive():
 	start = True;
 	if (start):
 		await voice_out("Hello!")
+		await upload_to_database(True, "Hello")
 		start = False;
 	
 	auth_key = "8fb4e965ed4a4303b8d250009e6ea54d"
