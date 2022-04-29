@@ -80,6 +80,8 @@ async def voice_out(text_input):
 	await asyncio.sleep(0.03)
 
 async def handle_text(txt):
+	#rasa code
+	# r = requests.post('http://localhost:5002/webhooks/rest/webhook', json={"sender": sender, "message": message})
 	await upload_to_database(False, txt)
 	if all(x in str(txt) for x in ["Hi", "computer", "."]):
 		await asyncio.gather(voice_out("Hello!"))
