@@ -5,6 +5,7 @@ import base64
 import json
 import pyttsx3
 import firebase_admin
+import datetime
 from firebase_admin import credentials
 from firebase_admin import firestore
 from gtts import gTTS
@@ -54,25 +55,23 @@ stream = p.open(
 )
 
 
-# the AssemblyAI endpoint we're going to hit
+# the AssemblyAI endpoint we hit
 URL = "wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000"
 
 async def upload_to_database(doll, text):
 	db = firestore.client()
-	doc_ref = db.collection(u'Messages').document(u'PF9IRnCJSCmpANNWV850')
-	doc_ref.update({
-		u'isDoll': doll,
-		u'speech': text
-	})
+	doc_ref = db.collection('Messages').document('BROhk27nFKRABbRQ0q9f')
+	doc_ref.update({u'conversation': firestore.ArrayUnion([
+	{u'isDoll' : doll, u'speech' : text}])})
+	doc_ref.update({u'date': str(datetime.date.today())})
+#, u'time' : str(datetime.date.today())
 
 async def voice_out(text_input):
-	# engine = pyttsx3.init()
-	# engine.setProperty('voice','english_rp+f3')
-	# engine.say(text_input)
-	# engine.runAndWait()
 	await upload_to_database(True, text_input)
 	tts = gTTS(text_input, lang='en')
 	tts.save('temp.mp3')
+
+
 	tts_out = AudioSegment.from_file('temp.mp3')
 	play(tts_out)
 
@@ -94,11 +93,9 @@ async def send_receive():
 	start = True;
 	if (start):
 		await voice_out("Hello!")
-		await upload_to_database(True, "Hello")
 		start = False;
 	
 	auth_key = "8fb4e965ed4a4303b8d250009e6ea54d"
-	# print(f'Connecting websocket to url ${URL}')
 	async with websockets.connect(
 		URL,
 		extra_headers=(("Authorization", auth_key),),
