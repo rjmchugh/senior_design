@@ -1,4 +1,7 @@
 # adapted from code on www.assemblyai.com
+# https://www.assemblyai.com/blog/real-time-speech-recognition-with-python/
+# example for using installed deepspeech model
+# https://www.assemblyai.com/blog/deepspeech-for-dummies-a-tutorial-and-overview-part-1/
 import pyaudio
 import websockets
 import asyncio
